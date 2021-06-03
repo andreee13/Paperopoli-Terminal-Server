@@ -1,0 +1,3 @@
+SELECT movimentazione.*, movimentazione_tipo.nome as nome_tipo, movimentazione_stato.timestamp, movimentazione_stato_nome.nome as 
+        nome_stato FROM movimentazione LEFT JOIN movimentazione_tipo ON movimentazione.tipo = movimentazione_tipo.ID LEFT JOIN movimentazione_stato ON movimentazione.ID 
+        = movimentazione_stato.movimentazione LEFT JOIN movimentazione_stato_nome ON movimentazione_stato.stato = movimentazione_stato_nome.ID ORDER BY movimentazione.ID
