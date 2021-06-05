@@ -2,6 +2,14 @@
 class GoodStatus extends Model
 {
 
+    public function showAll()
+    {
+        $sql = "SELECT * from merce_stato_nome";
+        $req = Database::getDb()->prepare($sql);
+        $req->execute();
+        return $req->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
     public function create($params)
     {
         $sql = "INSERT INTO merce_stato (stato, timestamp, merce) VALUES (?, ?, ?)";

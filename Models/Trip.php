@@ -4,13 +4,16 @@ class Trip extends Model
 
     public function create($params)
     {
-        $sql = "INSERT INTO viaggio (ID, tipo, descrizione) VALUES (?, ?, ?)";
+        $sql = "INSERT INTO viaggio (ID, partenza_prevista, arrivo_previsto, partenza_effettiva, arrivo_effettivo, banchina) VALUES (?, ?, ?, ?, ?, ?)";
         $req = Database::getDb()->prepare($sql);
         $req->bind_param(
-            'iis',
+            'issssi',
             $params['id'],
-            $params['type'],
-            $params['description'],
+            $params['partenza_prevista'],
+            $params['arrivo_previsto'],
+            $params['partenza_effettiva'],
+            $params['arrivo_effettivo'],
+            $params['banchina'],
         );
         $req->execute();
         return $req->insert_id;

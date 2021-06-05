@@ -31,8 +31,8 @@ class shipsController extends Controller
 
     function status_names()
     {
-        $ship = new Ship();
-        $d['result'] = $ship->showStatusNames([]);
+        $ship = new ShipStatus();
+        $d['result'] = $ship->showAll([]);
         $this->set($d);
         $this->render('raw');
     }
@@ -41,11 +41,14 @@ class shipsController extends Controller
     {
         if (!empty($this->json['status'])) {
             $ship = new Ship();
+            $shipStatus = new ShipStatus();
             $result = $ship->create($this->json);
             if ($result) {
-                $d['result'] = ["id" => $result, "status" => $this->json['status']];
-                $this->set($d);
-                $this->render('result');
+                foreach ($this->json['status'] as $status) {
+                    $status['ship'] = $result;
+                    $shipStatus->create($status);
+                }
+                http_response_code(200);
             } else {
                 http_response_code(406);
             }

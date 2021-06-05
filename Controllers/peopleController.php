@@ -31,8 +31,8 @@ class peopleController extends Controller
 
     function status_names()
     {
-        $ship = new Person();
-        $d['result'] = $ship->showStatusNames([]);
+        $ship = new PersonStatus();
+        $d['result'] = $ship->showAll([]);
         $this->set($d);
         $this->render('raw');
     }
@@ -40,12 +40,15 @@ class peopleController extends Controller
     function create()
     {
         if (!empty($this->json['status'])) {
-            $person = new person();
+            $person = new Person();
+            $personStatus = new PersonStatus();
             $result = $person->create($this->json);
             if ($result) {
-                $d['result'] = ["id" => $result, "status" => $this->json['status']];
-                $this->set($d);
-                $this->render('result');
+                foreach ($this->json['status'] as $status) {
+                    $status['person'] = $result;
+                    $personStatus->create($status);
+                }
+                http_response_code(200);
             } else {
                 http_response_code(406);
             }

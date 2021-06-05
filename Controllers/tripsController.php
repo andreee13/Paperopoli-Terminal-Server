@@ -22,13 +22,11 @@ class tripsController extends Controller
 
     function create()
     {
-        if (!empty($this->json['status'])) {
+        if (!empty($this->json['arrivo_previsto']) && !empty($this->json['partenza_prevista'])) {
             $trip = new Trip();
             $result = $trip->create($this->json);
             if ($result) {
-                $d['result'] = ["id" => $result];
-                $this->set($d);
-                $this->render('result');
+                http_response_code(200);
             } else {
                 http_response_code(406);
             }

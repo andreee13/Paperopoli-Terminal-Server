@@ -1,5 +1,6 @@
 <?php
 require(ROOT . 'Models/Operation.php');
+require(ROOT . 'Models/OperationStatus.php');
 
 class operationsController extends Controller
 {
@@ -20,15 +21,29 @@ class operationsController extends Controller
         $this->render('result');
     }
 
+    function types()
+    {
+        $ship = new Operation();
+        $d['result'] = $ship->showTypes([]);
+        $this->set($d);
+        $this->render('raw');
+    }
+
+    function status_names()
+    {
+        $ship = new OperationStatus();
+        $d['result'] = $ship->showAll([]);
+        $this->set($d);
+        $this->render('raw');
+    }
+
     function create()
     {
-        if (!empty($this->json['trip']) && !empty($this->json['type'])) {
+        if (!empty($this->json['trip'])) {
             $operation = new Operation();
             $result = $operation->create($this->json);
             if ($result) {
-                $d['result'] = ["id" => $result];
-                $this->set($d);
-                $this->render('result');
+                http_response_code(200);
             } else {
                 http_response_code(406);
             }
@@ -39,13 +54,21 @@ class operationsController extends Controller
 
     function edit()
     {
-        if (!empty($this->json['id']) && !empty($this->json['trip']) && !empty($this->json['trip'])) {
+        if (!empty($this->json['id']) && !empty($this->json['trip'])) {
             $operation = new Operation();
             $result = $operation->edit($this->json);
+            $operationStatus = new OperationStatus();
+            foreach ($this->json['status'] as $status) {
+                echo json_encode($status);
+                if ($status['is_new'] && !$status['is_deleted']) {
+                    $status['operation'] = $this->json['id'];
+                    $operationStatus->create($status);
+                } else if ($status['is_deleted']) {
+                    $operationStatus->delete($status);
+                }
+            }
             if ($result) {
-                $d['result'] = $this->json;
-                $this->set($d);
-                $this->render('result');
+                http_response_code(200);
             } else {
                 http_response_code(406);
             }

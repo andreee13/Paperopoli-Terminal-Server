@@ -2,6 +2,14 @@
 class ShipStatus extends Model
 {
 
+    public function showAll()
+    {
+        $sql = "SELECT * from nave_stato_nome";
+        $req = Database::getDb()->prepare($sql);
+        $req->execute();
+        return $req->get_result()->fetch_all(MYSQLI_ASSOC);
+    }
+
     public function create($params)
     {
         $sql = "INSERT INTO nave_stato (stato, timestamp, nave) VALUES (?, ?, ?)";

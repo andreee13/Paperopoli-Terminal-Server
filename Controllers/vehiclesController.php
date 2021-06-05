@@ -31,21 +31,24 @@ class vehiclesController extends Controller
 
     function status_names()
     {
-        $ship = new Vehicle();
-        $d['result'] = $ship->showStatusNames([]);
+        $ship = new VehicleStatus();
+        $d['result'] = $ship->showAll([]);
         $this->set($d);
         $this->render('raw');
     }
 
     function create()
     {
-        if (!empty($this->json['status']) && !empty($this->json['plate'])) {
+        if (!empty($this->json['status'])) {
             $vehicle = new Vehicle();
+            $vehicleStatus = new VehicleStatus();
             $result = $vehicle->create($this->json);
             if ($result) {
-                $d['result'] = $this->json;;
-                $this->set($d);
-                $this->render('result');
+                foreach ($this->json['status'] as $status) {
+                    $status['vehicle'] = $result;
+                    $vehicleStatus->create($status);
+                }
+                http_response_code(200);
             } else {
                 http_response_code(406);
             }

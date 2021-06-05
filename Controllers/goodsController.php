@@ -31,8 +31,8 @@ class goodsController extends Controller
 
     function status_names()
     {
-        $ship = new Good();
-        $d['result'] = $ship->showStatusNames([]);
+        $ship = new GoodStatus();
+        $d['result'] = $ship->showAll([]);
         $this->set($d);
         $this->render('raw');
     }
@@ -41,11 +41,14 @@ class goodsController extends Controller
     {
         if (!empty($this->json['status'])) {
             $good = new Good();
+            $goodStatus = new GoodStatus();
             $result = $good->create($this->json);
             if ($result) {
-                $d['result'] = ['id' => $result, 'status' => $this->json['status']];
-                $this->set($d);
-                $this->render('result');
+                foreach ($this->json['status'] as $status) {
+                    $status['good'] = $result;
+                    $goodStatus->create($status);
+                }
+                http_response_code(200);
             } else {
                 http_response_code(406);
             }
