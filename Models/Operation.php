@@ -4,14 +4,26 @@ class Operation extends Model
 
     public function create($params)
     {
-        $sql = "INSERT INTO movimentazione (ID, tipo, descrizione, viaggio) VALUES (?, ?, ?, ?)";
+        $sql = "SELECT * FROM movimentazione_tipo WHERE nome = ?";
         $req = Database::getDb()->prepare($sql);
         $req->bind_param(
-            'iisi',
-            $params['id'],
+            's',
             $params['type'],
+        );
+        $req->execute();
+        $type_id = $req->get_result()->fetch_all(MYSQLI_ASSOC)[0]['ID'];
+        $sql = "INSERT INTO movimentazione (ID, tipo, descrizione, viaggio, navi, merci, persone, veicoli) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        $req = Database::getDb()->prepare($sql);
+        $req->bind_param(
+            'iisissss',
+            $params['id'],
+            $type_id,
             $params['description'],
             $params['trip'],
+            $params['ships'],
+            $params['goods'],
+            $params['people'],
+            $params['vehicles'],
         );
         $req->execute();
         return $req->insert_id;
@@ -35,13 +47,25 @@ class Operation extends Model
 
     public function edit($params)
     {
-        $sql = "UPDATE movimentazione SET tipo = ?, descrizione = ?, viaggio = ? WHERE ID = ?";
+        $sql = "SELECT * FROM movimentazione_tipo WHERE nome = ?";
         $req = Database::getDb()->prepare($sql);
         $req->bind_param(
-            'isii',
+            's',
             $params['type'],
+        );
+        $req->execute();
+        $type_id = $req->get_result()->fetch_all(MYSQLI_ASSOC)[0]['ID'];
+        $sql = "UPDATE movimentazione SET tipo = ?, descrizione = ?, viaggio = ?, navi = ?, merci = ?, persone = ?, veicoli = ? WHERE ID = ?";
+        $req = Database::getDb()->prepare($sql);
+        $req->bind_param(
+            'isissssi',
+            $type_id,
             $params['description'],
-            $params['trip'],
+            $params['trip'], 
+            $params['ships'],
+            $params['goods'],
+            $params['people'],
+            $params['vehicles'],
             $params['id'],
         );
         return $req->execute();

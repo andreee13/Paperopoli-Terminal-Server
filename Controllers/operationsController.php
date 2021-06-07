@@ -39,10 +39,15 @@ class operationsController extends Controller
 
     function create()
     {
-        if (!empty($this->json['trip'])) {
+        if (!empty($this->json['trip']) && !empty($this->json['status'])) {
             $operation = new Operation();
+            $operationStatus = new OperationStatus();
             $result = $operation->create($this->json);
             if ($result) {
+                foreach ($this->json['status'] as $status) {
+                    $status['operation'] = $result;
+                    $operationStatus->create($status);
+                }
                 http_response_code(200);
             } else {
                 http_response_code(406);
@@ -59,7 +64,6 @@ class operationsController extends Controller
             $result = $operation->edit($this->json);
             $operationStatus = new OperationStatus();
             foreach ($this->json['status'] as $status) {
-                echo json_encode($status);
                 if ($status['is_new'] && !$status['is_deleted']) {
                     $status['operation'] = $this->json['id'];
                     $operationStatus->create($status);
@@ -80,11 +84,9 @@ class operationsController extends Controller
     function delete()
     {
         if (!empty($this->json['id'])) {
-            $operation = new Operation();
-            if ($operation->delete($this->json)) {
-                $d['result'] = $this->json;
-                $this->set($d);
-                $this->render('result');
+            $ship = new Operation();
+            if ($ship->delete($this->json)) {
+                http_response_code(200);
             } else {
                 http_response_code(400);
             }
