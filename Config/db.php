@@ -8,7 +8,7 @@ class Database {
 
     public static function getDb() {
         if(is_null(self::$db)) {
-            self::$db = new mysqli('localhost', 'root', null, DB_NAME);
+            self::$db = new mysqli('localhost', 'root', 'qwerty123', DB_NAME);
         }
         return self::$db;
     }
